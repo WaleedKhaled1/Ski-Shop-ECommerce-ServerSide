@@ -1,4 +1,6 @@
+using Core.Interfaces;
 using Infrastructure.Data;
+using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +12,8 @@ builder.Services.AddDbContext<StoreDbContext>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+builder.Services.AddScoped<IProductRepository,ProductRepository>();
+
 var app = builder.Build();
 
     app.UseHttpsRedirection();
@@ -17,5 +21,22 @@ var app = builder.Build();
     app.UseAuthorization();
 
     app.MapControllers();
+
+     try
+     {
+        using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        var context = services.GetRequiredService<StoreDbContext>();
+        await context.Database.MigrateAsync();
+        await StoreProductsSeed.SeedAsync(context);
+    }
+}
+     
+     catch (Exception ex)
+     {
+         Console.WriteLine(ex.Message);
+     }
+
 
     app.Run();
