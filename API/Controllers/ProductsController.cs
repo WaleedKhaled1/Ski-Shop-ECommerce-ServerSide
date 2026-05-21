@@ -39,5 +39,39 @@ namespace API.Controllers
             await _dbContext.SaveChangesAsync();
             return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateProduct(int id, Product product)
+        {
+            if (id != product.Id || !ProductExists(id))
+            {
+                return BadRequest("Cannot update product");
+            }
+
+            _dbContext.Entry(product).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private bool ProductExists(int id)
+        {
+            return _dbContext.Products.Any(e => e.Id == id);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            var product = await _dbContext.Products.FindAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            _dbContext.Products.Remove(product);
+            await _dbContext.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }
