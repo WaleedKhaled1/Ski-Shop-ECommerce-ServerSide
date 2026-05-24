@@ -12,7 +12,6 @@ namespace Infrastructure.Repositories
         public void AddProductAsync(Product product)
         {
             storeDbContext.Products.Add(product);
-
         }
 
         public void DeleteProductAsync(Product product)
