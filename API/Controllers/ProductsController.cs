@@ -5,19 +5,18 @@ using Infrastructure.Data;
 using Core.Interfaces;
 using Core.Specification;
 using Core.Specifications;
+using API.Helpers;
 namespace API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProductsController(IGenericRepository<Product> productRepository) : ControllerBase
+  
+    public class ProductsController(IGenericRepository<Product> productRepository) : BaseApiController
     {
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts(string? brand, string? type,string? sort)
+        public async Task<ActionResult<IEnumerable<Product>>> GetProducts([FromQuery] ProductSpecParams specParams)
         {
-            var spec=new ProductSpecification(brand, type, sort);
-             
-            var products = await productRepository.ListWithSpecAsync(spec);
-            return Ok(products);
+            var spec=new ProductSpecification(specParams);
+
+            return await CreatePagination(productRepository, spec,specParams.PageNumber,specParams.PageSize);
         }
 
         [HttpGet("{id}")]

@@ -77,6 +77,15 @@ namespace Infrastructure.Repositories
         {
             return await ApplySpecification(spec).ToListAsync();
         }
+
+        public async Task<int> GetCountAsync(ISpecification<T> spec)
+        {
+           var query=storeDbContext.Set<T>().AsQueryable();
+
+           var countQuery=spec.ApplyCriteia(query);
+
+            return await countQuery.CountAsync();
         }
+    }
     }
 
