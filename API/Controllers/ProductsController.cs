@@ -20,7 +20,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product?>> GetProduct(int id)
+        public async Task<ActionResult<Product?>> GetProduct(int id)    
         {
             var product = await productRepository.GetByIdAsync(id);
             if (product == null)
