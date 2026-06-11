@@ -4,10 +4,11 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Core.Entities;
 using Infrastructure.Config;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Infrastructure.Data
 {
-    public class StoreDbContext : DbContext
+    public class StoreDbContext : IdentityDbContext<AppUser>
     {
         public StoreDbContext(DbContextOptions<StoreDbContext> options) : base(options)
         {
@@ -20,5 +21,6 @@ namespace Infrastructure.Data
         }
 
         public DbSet<Product> Products { get; set; }
+        public DbSet<Address> Addresses { get; set; }
     }
 }

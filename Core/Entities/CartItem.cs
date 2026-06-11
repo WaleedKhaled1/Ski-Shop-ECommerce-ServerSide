@@ -2,12 +2,12 @@
 {
     public class CartItem
     {
-        public int productId { get; set; }
-        public required string productName { get; set; }
-        public decimal price { get; set; }
-        public required string pictureUrl { get; set; }
-        public required string type { get; set; }
-        public required string brand { get; set; }
-        public int quantity { get; set; }
+        public int ProductId { get; set; }
+        public required string ProductName { get; set; }
+        public decimal Price { get; set; }
+        public required string PictureUrl { get; set; }
+        public required string Type { get; set; }
+        public required string Brand { get; set; }
+        public int Quantity { get; set; }
     }
 }

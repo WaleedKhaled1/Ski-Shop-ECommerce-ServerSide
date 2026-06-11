@@ -38,7 +38,7 @@ namespace Infrastructure.Data
             return query;
         }
 
-        public static IQueryable<TResult> GetQuery<T,TResult>(IQueryable<T> inputQuery, ISpecification<T, TResult> spec)
+        public static IQueryable<TResult> GetQuery<TResult>(IQueryable<T> inputQuery, ISpecification<T, TResult> spec)
         {
             var query = inputQuery;
             if (spec.Criteria != null)
