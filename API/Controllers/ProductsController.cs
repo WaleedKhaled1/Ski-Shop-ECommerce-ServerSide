@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using API.Helpers;
 using Core.Entities;
-using Infrastructure.Data;
 using Core.Interfaces;
 using Core.Specification;
 using Core.Specifications;
-using API.Helpers;
+using Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 namespace API.Controllers
 {
   
@@ -49,6 +50,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Product>> CreateProduct(Product product)
         {
              productRepository.Add(product);
@@ -60,6 +62,7 @@ namespace API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateProduct(int id, Product product)
         {
             if (id != product.Id || !ProductExists(id))
@@ -77,10 +80,11 @@ namespace API.Controllers
 
         private bool ProductExists(int id)
         {
-            return productRepository.IsExist(id) ;
+            return productRepository.IsExist(id);
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var product = await productRepository.GetByIdAsync(id);
@@ -91,7 +95,7 @@ namespace API.Controllers
 
              productRepository.Delete(product);
 
-            if(await productRepository.SaveChangesAsync() ) return BadRequest("Failed to delete product");
+            if(!await productRepository.SaveChangesAsync() ) return BadRequest("Failed to delete product");
             return NoContent();
         }
     }

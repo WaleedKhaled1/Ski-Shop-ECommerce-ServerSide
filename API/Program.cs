@@ -3,6 +3,7 @@ using Core.Entities;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 
@@ -20,7 +21,8 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 
 builder.Services.AddSingleton<ICartService, CartService>();
 builder.Services.AddIdentityApiEndpoints<AppUser>()
-   .AddEntityFrameworkStores<StoreDbContext>();
+    .AddRoles<IdentityRole>() 
+    .AddEntityFrameworkStores<StoreDbContext>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
@@ -55,8 +57,12 @@ app.UseAuthentication();
         {
         var services = scope.ServiceProvider;
         var context = services.GetRequiredService<StoreDbContext>();
+
+        var userManager = services.GetRequiredService<UserManager<AppUser>>();
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
         await context.Database.MigrateAsync();
-        await StoreProductsSeed.SeedAsync(context);
+        await StoreProductsSeed.SeedAsync(context, userManager, roleManager);   
         }
      }
      

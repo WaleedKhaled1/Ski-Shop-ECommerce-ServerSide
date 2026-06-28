@@ -10,22 +10,21 @@ namespace API.Controllers
     public class AccountController(SignInManager<AppUser> signInManager) : BaseApiController
     {
         [HttpPost("register")]
-       public async Task<ActionResult> Register(RegisterDto registerDto)
+        public async Task<ActionResult> Register(RegisterDto registerDto)
         {
             var user = new AppUser
             {
-                FirstName = registerDto.FirstName,  
+                FirstName = registerDto.FirstName,
                 LastName = registerDto.LastName,
                 Email = registerDto.Email,
                 UserName = registerDto.Email,
-               
             };
 
-            var result=await signInManager.UserManager.CreateAsync(user,registerDto.Password);
+            var result = await signInManager.UserManager.CreateAsync(user, registerDto.Password);
 
-            if(!result.Succeeded)
+            if (!result.Succeeded)
             {
-                foreach(var error  in result.Errors)
+                foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(error.Code, error.Description);
                 }
@@ -33,7 +32,20 @@ namespace API.Controllers
                 return ValidationProblem();
             }
 
-            return Ok(result);
+            var roleResult = await signInManager.UserManager.AddToRoleAsync(user, "Customer");
+
+            if (!roleResult.Succeeded)
+            {
+                return BadRequest("Failed to assign default role to user");
+            }
+
+            return Ok(new
+            {
+                user.FirstName,
+                user.LastName,
+                user.Email,
+                Roles = new[] { "Customer" }
+            });
         }
 
         [HttpPost("logout")]
@@ -48,19 +60,25 @@ namespace API.Controllers
         [HttpGet("user-info")]
         public async Task<ActionResult> GetUserInfo()
         {
-            if(User.Identity?.IsAuthenticated==false)
+            if (User.Identity?.IsAuthenticated == false)
             {
                 return NoContent();
             }
 
             var user = await signInManager.UserManager.GetUserByEmailWithAddress(User);
 
+            if (user == null) return Unauthorized();
+
+          
+            var roles = await signInManager.UserManager.GetRolesAsync(user);
+
             return Ok(new
             {
                 user.FirstName,
                 user.LastName,
                 user.Email,
-                Address = user.Address?.ToDto()
+                Address = user.Address?.ToDto(),
+                Roles = roles 
             });
         }
 
@@ -78,7 +96,7 @@ namespace API.Controllers
         [HttpPost("address")]
         public async Task<ActionResult<Address>> CreateOrUpdateAddress(AddressDto addressDto)
         {
-            var user=await signInManager.UserManager.GetUserByEmail(User);
+            var user=await signInManager.UserManager.GetUserByEmailWithAddress(User);
           
             if(user.Address == null)
             {

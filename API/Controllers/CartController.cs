@@ -13,6 +13,7 @@ namespace API.Controllers
 
             return Ok(cart?? new ShoppingCart { Id=id});
         }
+
         [HttpPost]
         public async Task<ActionResult> UpdateCart(ShoppingCart cart)
         {
@@ -24,6 +25,7 @@ namespace API.Controllers
             }
             return Ok(updatedCart);
         }
+
         [HttpDelete]
         public async Task<ActionResult> DeleteCart(string id)
         {
